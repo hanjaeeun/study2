@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <!-- resource/mapper/board.xml -->
+<mapper namespace="com.study.board.dao.IBoardDao">
+<sql id="boardListWhereClause">
+	<where>
+  		<if test="searchWord != null and searchWord != '' ">
+  			<choose>
+  				<when test="searchType == 'all' ">
+  						bo_title   LIKE '%' || #{searchWord} || '%'
+  					OR	bo_writer  LIKE '%' || #{searchWord} || '%'
+  					OR	bo_content LIKE '%' || #{searchWord} || '%'
+  				</when>
+  				<when test="searchType == 'bo_title' ">
+  					bo_title LIKE '%' || #{searchWord} || '%'
+  				</when>
+  				<when test="searchType == 'bo_writer' ">
+  					bo_writer LIKE '%' || #{searchWord} || '%'
+  				</when>
+  				<when test="searchType == 'bo_content' ">
+  					bo_content LIKE '%' || #{searchWord} || '%'
+  				</when>  				
+  			</choose>
+  		</if>
+  	</where>
+</sql> 
+ <select id="getBoardCount" parameterType="boardSearch" resultType="int">
+  select count(*) from tb_board1
+
+ </select>
+ 
+  <select id="getBoardList" parameterType="int" resultType="board">
+   <include refid="common.prePaging"></include>                                     
+SELECT                                                       
+       bo_no                                                
+     , bo_title                                              
+     , bo_writer                                              
+     , bo_passwd                                           
+     , bo_email                                             
+     , bo_content                                           
+     , bo_ip                                                 
+     , bo_read_cnt                                            
+     , TO_CHAR(bo_reg_date,'YYYY/MM/DD') AS bo_reg_date        
+     , TO_CHAR(bo_mod_date,'YYYY/MM/DD') AS bo_mod_date      
+  FROM tb_board1  
+  <include refid="boardListWhereClause"></include>                                          
+   order by bo_no desc                                        
+   
+   <include refid="common.postPaging"></include>                                                                         
+  </select>
+  
+  
+  <select id="getBoard" parameterType="int" resultType="board">
+    SELECT                                                      
+       bo_no                                                    
+     , bo_title                                                 
+     , bo_writer                                                
+     , bo_passwd                                                
+     , bo_email                                                
+     , bo_content                                            
+     , bo_ip                                                   
+     , bo_read_cnt                                              
+     , TO_CHAR(bo_reg_date,'YYYY/MM/DD') AS bo_reg_date        
+     , TO_CHAR(bo_mod_date,'YYYY/MM/DD') AS bo_mod_date         
+  FROM tb_board1                                                
+ WHERE bo_no  = #{bo_no}                                             
+  
+  </select>
+  
+  
+ <update id="updateBoard" parameterType="board">
+  UPDATE tb_board1  SET    
+      bo_title  = #{bo_title}  
+    , bo_writer = #{bo_writer}   
+    , bo_passwd = #{bo_passwd}     
+    , bo_email =  #{bo_email}     
+    , bo_content = #{bo_content}  
+ WHERE bo_no  = #{bo_no}       
+   </update>
+   
+   
+   <insert id="insertBoard" parameterType="board">
+   INSERT INTO tb_board1 ( 
+   bo_no,               
+   bo_title,            
+   bo_writer,           
+   bo_passwd,           
+   bo_content           
+) VALUES (              
+  tb_board1_bo_no.nextval,   
+   #{bo_title},                   
+    #{bo_writer},                   
+   #{bo_passwd},                   
+    #{bo_content}                    
+)                       
+</insert>
+
+   
+   
+</mapper>
